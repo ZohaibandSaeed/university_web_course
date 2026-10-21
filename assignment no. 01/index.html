@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance System</title>
+</head>
+
+<body>
+
+    <button onclick="SubjectShow()">Subjects</button>
+    <div id="drop_down_list"></div>
+
+    <br>
+
+    <div id="attendance"></div>
+
+    <script>
+        let students = ["Ali", "Ahmed", "Sara", "Ayesha", "Usman"];
+        let dayCount = 0;
+
+        function SubjectShow() {
+            document.getElementById("drop_down_list").innerHTML = `
+                <br>
+                <select id="subject_list" onchange="SelectedSubject()">
+                    <option value="">Select Subject</option>
+                    <option value="English">English</option>
+                    <option value="Urdu">Urdu</option>
+                    <option value="Math">Math</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                </select>
+
+                <br><br>
+
+                <button onclick="AddDay()">Add Day</button>
+
+            `;
+        }
+
+        function SelectedSubject() {
+            let subject = document.getElementById("subject_list").value;
+            dayCount = 0;
+
+            if (subject === "") {
+                document.getElementById("attendance").innerHTML = "";
+                return;
+            }
+
+            document.getElementById("attendance").innerHTML = `
+                <h3>${subject} Attendance</h3>
+                <table border="1" cellpadding="8">
+                    <thead>
+                        <tr id="tableHead">
+                            <th>Student Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            `;
+
+            students.forEach(name => {
+                document.getElementById("tableBody").innerHTML += `
+                    <tr>
+                        <td>${name}</td>
+                    </tr>
+                `;
+            });
+
+            AddDay();
+        }
+
+        function AddDay() {
+            if (!document.getElementById("tableHead")) {
+                alert("Please select a subject first!");
+                return;
+            }
+
+            dayCount++;
+
+            let head = document.getElementById("tableHead");
+            let th = document.createElement("th");
+
+            th.innerHTML = `
+                Day ${dayCount}<br>
+                <input type="checkbox"
+                    onchange="MarkAll(this, ${dayCount})">
+                All Present
+            `;
+
+            head.appendChild(th);
+
+            let rows = document.querySelectorAll("#tableBody tr");
+
+            rows.forEach((row, index) => {
+                let td = document.createElement("td");
+
+                td.innerHTML = `
+                    <input type="checkbox"
+                        class="day-${dayCount}"
+                        data-student="${students[index]}"
+                        onchange="UpdateAll(${dayCount})">
+                `;
+
+                row.appendChild(td);
+            });
+        }
+
+        function MarkAll(checkbox, day) {
+            document.querySelectorAll(".day-" + day).forEach(input => {
+                input.checked = checkbox.checked;
+            });
+        }
+
+        function UpdateAll(day) {
+            let boxes = document.querySelectorAll(".day-" + day);
+            let allBox = document.querySelector(
+                "#tableHead th:nth-child(" + (day + 1) + ") input"
+            );
+
+            allBox.checked = [...boxes].every(box => box.checked);
+        }
+    </script>
+
+</body>
+
+</html>
